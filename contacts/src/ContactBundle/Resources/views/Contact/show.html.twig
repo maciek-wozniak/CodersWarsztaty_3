@@ -1,0 +1,78 @@
+{% extends "ContactBundle::main.html.twig" %}
+
+{% block title %}Contact details{% endblock %}
+
+{% block body %}
+
+    {% for flash_message in app.session.flashBag.get('notice') %}
+        <div> {{ flash_message }} </div><br>
+    {% endfor %}
+
+    <h1>{{ contact.name }} {{ contact.surname }}</h1>
+    <p>{{ contact.description  }}</p>
+
+    <p>Phone:
+    <ul>
+        {% for phone in contact.phones %}
+            <li>{{ phone.number }}
+                {% if phone.type is not null %}
+                    - {{ phone.type }}
+                {% endif %}
+                <a href="{{ path('contact_phone_delete', {'contact':contact.id, 'id':phone.id}) }}">Delete</a>
+            </li>
+        {% else %}
+            <li>Not defined</li>
+        {% endfor %}
+    </ul>
+    </p>
+
+    <p>Email:
+        <ul>
+            {% for email in contact.emails %}
+                <li>{{ email.address }}
+                    {% if email.type is not null %}
+                        - {{ email.type }}
+                    {% endif %}
+                    <a href="{{ path('contact_email_delete', {'contact':contact.id, 'id':email.id}) }}">Delete</a>
+                </li>
+            {% else %}
+                <li>Not defined</li>
+            {% endfor %}
+        </ul>
+    </p>
+
+    <p>Address:
+        <ul>
+        {% for address in contact.addresses %}
+            <li>{{ address.city }} {{ address.street }} {{ address.houseNumber }}
+                {% if address.flatNumber is not null %}
+                    / {{ address.flatNumber }}
+                {% endif %}
+                <a href="{{ path('contact_address_delete', {'contact':contact.id, 'id':address.id}) }}">Delete</a>
+            </li>
+        {% else %}
+            <li>Not defined</li>
+        {% endfor %}
+        </ul>
+    </p>
+
+    <p>Groups:
+    <ul>
+        {% for group in contact.groups %}
+            <li>{{ group.name }} </li>
+        {% else %}
+            <li>Not defined</li>
+        {% endfor %}
+    </ul>
+    </p>
+
+
+    <br>
+    <a href="{{ path('contact_contact_modify', {'id':contact.id}) }}">Edit</a><br>
+    <a href="{{ path('contact_contact_modify', {'id':contact.id}) }}">Add phone</a><br>
+    <a href="{{ path('contact_contact_modify', {'id':contact.id}) }}">Add email</a><br>
+    <a href="{{ path('contact_contact_modify', {'id':contact.id}) }}">Add address</a><br>
+
+    <br><br>
+    <a href="{{ path('contact_contact_showall') }}">Show all</a>
+{% endblock %}

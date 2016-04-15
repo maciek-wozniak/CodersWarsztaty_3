@@ -1,0 +1,24 @@
+{% extends "ContactBundle::main.html.twig" %}
+
+{% block title %}All contacts{% endblock %}
+
+{% block body %}
+
+    {% for flash_message in app.session.flashBag.get('notice') %}
+        <div> {{ flash_message }} </div><br>
+    {% endfor %}
+
+    {% for contact in contacts %}
+    <a href="{{ path('contact_contact_show', {'id':contact.id}) }}">
+        {{ contact.name }} {{ contact.surname }}
+    </a>
+
+        <a href="{{ path('contact_contact_delete', {'id':contact.id}) }}">Delete</a>
+        <a href="{{ path('contact_contact_modify', {'id':contact.id}) }}">Edit</a>
+        <br>
+    {% else %}
+        Brak kontaktów
+    {% endfor %}
+<br>
+    <a href="{{ path('contact_contact_create') }}">Add contact</a>
+{% endblock %}

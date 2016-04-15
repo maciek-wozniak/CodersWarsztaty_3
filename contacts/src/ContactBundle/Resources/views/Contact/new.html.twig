@@ -1,0 +1,11 @@
+{% extends "ContactBundle::main.html.twig" %}
+
+{% block title %}New contact{% endblock %}
+
+{% block body %}
+
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    {{ form_end(form) }}
+
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "ContactBundle::main.html.twig" %}
+
+{% block title %}Edit contact{% endblock %}
+
+{% block body %}
+
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    {{ form_end(form) }}
+
+    <br>
+    {{ form_start(addressForm) }}
+    {{ form_widget(addressForm) }}
+    {{ form_end(addressForm) }}
+
+    <br>
+    {{ form_start(emailForm) }}
+    {{ form_widget(emailForm) }}
+    {{ form_end(emailForm) }}
+
+    <br>
+    {{ form_start(phoneForm) }}
+    {{ form_widget(phoneForm) }}
+    {{ form_end(phoneForm) }}
+{% endblock %}
