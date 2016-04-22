@@ -1,0 +1,26 @@
+{% extends "ContactBundle::main.html.twig" %}
+
+{% block title %}All groups{% endblock %}
+
+{% block body %}
+
+    {% for flash_message in app.session.flashBag.get('notice') %}
+        <div> {{ flash_message }} </div><br>
+    {% endfor %}
+    <p>All groups:</p>
+    <ul>
+    {% for group in groups %}
+        <li>
+            <a href="{{ path('contact_group_show', {'id':group.id}) }}">
+                {{ group.name }}
+            </a> -
+
+            <a href="{{ path('contact_group_delete', {'id':group.id}) }}">Delete</a>
+        </li>
+    {% else %}
+        Brak grup
+    {% endfor %}
+    </ul>
+    <a href="{{ path('contact_group_new') }}">Add group</a><br>
+    <a href="{{ path('contact_contact_showall') }}">All contacts</a><br>
+{% endblock %}

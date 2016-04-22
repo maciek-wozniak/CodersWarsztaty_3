@@ -8,17 +8,26 @@
         <div> {{ flash_message }} </div><br>
     {% endfor %}
 
-    {% for contact in contacts %}
-    <a href="{{ path('contact_contact_show', {'id':contact.id}) }}">
-        {{ contact.name }} {{ contact.surname }}
-    </a>
+    {{ form_start(search) }}
+    {{ form_widget(search) }}
+    {{ form_end(search) }}
 
-        <a href="{{ path('contact_contact_delete', {'id':contact.id}) }}">Delete</a>
-        <a href="{{ path('contact_contact_modify', {'id':contact.id}) }}">Edit</a>
-        <br>
+    <p>All contacts:</p>
+    <ul>
+    {% for contact in contacts %}
+        <li>
+            <a href="{{ path('contact_contact_show', {'id':contact.id}) }}">
+                {{ contact.name }} {{ contact.surname }}
+            </a> -
+
+            <a href="{{ path('contact_contact_delete', {'id':contact.id}) }}">Delete</a>
+            <a href="{{ path('contact_contact_modify', {'id':contact.id}) }}">Edit</a>
+        </li>
     {% else %}
-        Brak kontaktów
+        <li>Brak kontaktów</li>
     {% endfor %}
-<br>
-    <a href="{{ path('contact_contact_create') }}">Add contact</a>
+    </ul>
+    <a href="{{ path('contact_contact_create') }}">Add contact</a><br>
+    <a href="{{ path('contact_group_new') }}">Add group</a><br>
+    <a href="{{ path('contact_group_showall') }}">Show all group</a><br>
 {% endblock %}

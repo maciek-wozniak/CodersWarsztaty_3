@@ -4,14 +4,18 @@ namespace ContactBundle\Controller;
 
 use ContactBundle\Entity\Contact;
 use ContactBundle\Entity\Address;
+use ContactBundle\Entity\ContactGroup;
 use ContactBundle\Entity\Email;
 use ContactBundle\Entity\Phone;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\BrowserKit\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 class ContactController extends Controller {
 
@@ -74,10 +78,14 @@ class ContactController extends Controller {
         $url = $this->generateUrl('contact_contact_newphone', ['id' => $id]);
         $phoneForm = $this->newPhoneForm($phone, 'Add phone', $url);
 
+        $url = $this->generateUrl('contact_contact_newgroup', ['id' => $id]);
+        $groupForm = $this->newGroupForm($url, $contact->getGroups());
+
         return ['form' => $form->createView(),
                 'addressForm' => $addressForm->createView(),
                 'emailForm' => $emailForm->createView(),
-                'phoneForm' => $phoneForm->createView()
+                'phoneForm' => $phoneForm->createView(),
+                'groupForm' => $groupForm->createView()
         ];
     }
 
@@ -105,6 +113,9 @@ class ContactController extends Controller {
         $url = $this->generateUrl('contact_contact_newphone', ['id' => $id]);
         $phoneForm = $this->newPhoneForm($phone, 'Add phone', $url);
 
+        $url = $this->generateUrl('contact_contact_newgroup', ['id' => $id]);
+        $groupForm = $this->newGroupForm($url, $contact->getGroups());
+
         $address = new Address();
         $address->setContact($contact);
         $url = $this->generateUrl('contact_contact_newaddress', ['id' => $id]);
@@ -124,7 +135,8 @@ class ContactController extends Controller {
         return ['form' => $form->createView(),
                 'addressFrom' => $addressForm->createView(),
                 'emailForm' => $emailForm->createView(),
-                'phoneForm' => $phoneForm->createView()
+                'phoneForm' => $phoneForm->createView(),
+                'groupForm' => $groupForm->createView()
         ];
     }
 
@@ -153,6 +165,9 @@ class ContactController extends Controller {
         $url = $this->generateUrl('contact_contact_newphone', ['id' => $id]);
         $phoneForm = $this->newPhoneForm($phone, 'Add phone', $url);
 
+        $url = $this->generateUrl('contact_contact_newgroup', ['id' => $id]);
+        $groupForm = $this->newGroupForm($url, $contact->getGroups());
+
         $email = new Email();
         $email->setContact($contact);
         $url = $this->generateUrl('contact_contact_newemail', ['id' => $id]);
@@ -173,7 +188,8 @@ class ContactController extends Controller {
         return ['form' => $form->createView(),
             'addressFrom' => $addressForm->createView(),
             'emailForm' => $emailForm->createView(),
-            'phoneForm' => $phoneForm->createView()
+            'phoneForm' => $phoneForm->createView(),
+            'groupForm' => $groupForm->createView()
         ];
     }
 
@@ -203,6 +219,9 @@ class ContactController extends Controller {
         $url = $this->generateUrl('contact_contact_newemail', ['id' => $id]);
         $emailForm = $this->newEmailForm($email, 'Add email', $url);
 
+        $url = $this->generateUrl('contact_contact_newgroup', ['id' => $id]);
+        $groupForm = $this->newGroupForm($url, $contact->getGroups());
+
         $phone = new Phone();
         $phone->setContact($contact);
         $url = $this->generateUrl('contact_contact_newphone', ['id' => $id]);
@@ -223,8 +242,69 @@ class ContactController extends Controller {
         return ['form' => $form->createView(),
             'addressFrom' => $addressForm->createView(),
             'emailForm' => $emailForm->createView(),
-            'phoneForm' => $phoneForm->createView()
+            'phoneForm' => $phoneForm->createView(),
+            'groupForm' => $groupForm->createView()
         ];
+    }
+
+
+    /**
+     * @Route("/{id}/addGroup")
+     * @Template("ContactBundle:Contact:new.html.twig")
+     * @Method("POST")
+     */
+
+    public function newGroupAction(Request $request, $id) {
+        $repository = $this->getDoctrine()->getRepository('ContactBundle:Contact');
+        $contact = $repository->find($id);
+
+        if (!$contact) {
+            throw $this->createNotFoundException('Contact not found');
+        }
+
+        $url = $this->generateUrl('contact_contact_modify', ['id' => $id]);
+        $form = $this->newContactForm($contact, 'Update', $url);
+
+        $address = new Address();
+        $url = $this->generateUrl('contact_contact_newaddress', ['id' => $id]);
+        $addressForm = $this->newAddressForm($address, 'Add address', $url);
+
+        $email = new Email();
+        $url = $this->generateUrl('contact_contact_newemail', ['id' => $id]);
+        $emailForm = $this->newEmailForm($email, 'Add email', $url);
+
+        $phone = new Phone();
+        $url = $this->generateUrl('contact_contact_newphone', ['id' => $id]);
+        $phoneForm = $this->newPhoneForm($phone, 'Add phone', $url);
+
+        $url = $this->generateUrl('contact_contact_newgroup', ['id' => $id]);
+        $groupForm = $this->newGroupForm($url, $contact->getGroups());
+        $groupForm->handleRequest($request);
+
+        if ($groupForm->isSubmitted()) {
+            $em = $this->getDoctrine()->getManager();
+
+            $group = $groupForm->getData()['group'];
+
+            if (!$group) {
+                throw $this->createNotFoundException('No such group');
+            }
+
+            $group->addContact($contact);
+            $contact->addGroup($group);
+            $em->flush();
+
+            $this->addFlash('notice', 'User added to group');
+            return $this->redirectToRoute('contact_contact_show', ['id' => $contact->getId()]);
+        }
+
+        return ['form' => $form->createView(),
+            'addressFrom' => $addressForm->createView(),
+            'emailForm' => $emailForm->createView(),
+            'phoneForm' => $phoneForm->createView(),
+            'groupForm' => $groupForm->createView()
+        ];
+
     }
 
 
@@ -236,13 +316,13 @@ class ContactController extends Controller {
         $contact = $repository->find($id);
 
         if (!$contact) {
-            return $this->redirectToRoute('contact_contact_showall');
+            throw $this->createNotFoundException('Contact not found');
         }
 
         $em = $this->getDoctrine()->getManager();
         $em->remove($contact);
         $em->flush();
-        $this->addFlash('notice', 'User was deleted');
+        $this->addFlash('notice', 'User deleted');
 
         return $this->redirectToRoute('contact_contact_showall');
 
@@ -263,12 +343,36 @@ class ContactController extends Controller {
     /**
      * @Route("/")
      * @Template()
+     * @Method("GET")
      */
     public function showAllAction() {
         $repository = $this->getDoctrine()->getRepository('ContactBundle:Contact');
         $contacts = $repository->findAll();
+        $search = $this->searchForm();
 
-        return ['contacts' => $contacts];
+        return [
+                'contacts' => $contacts,
+                'search' => $search->createView()
+        ];
+    }
+
+    /**
+     * @Route("/")
+     * @Template("ContactBundle:Contact:showAll.html.twig")
+     * @Method("POST")
+     */
+    public function searchContactAction(Request $request) {
+        $repository = $this->getDoctrine()->getRepository('ContactBundle:Contact');
+        $searchForm = $this->searchForm();
+
+        $form = $searchForm->handleRequest($request);
+        $search = $form->get('searchPhrase')->getData();
+        $contacts = $repository->findContacts($search);
+
+        return [
+            'contacts' => $contacts,
+            'search' => $searchForm->createView()
+        ];
     }
 
     private function newContactForm(Contact $contact, $submit, $url) {
@@ -308,6 +412,39 @@ class ContactController extends Controller {
             ->add('number')
             ->add('type')
             ->add($submit, 'submit')
+            ->getForm();
+    }
+
+    private function newGroupForm($url, $groups) {
+
+        return $this->createFormBuilder([])
+            ->setAction($url)
+            ->add('group', 'entity', array(
+                    'class' => 'ContactBundle:ContactGroup',
+                    'query_builder' => function (EntityRepository $er) use($groups) {
+                        $qb = $er->createQueryBuilder('cg');
+                        $ids = [];
+                        foreach ($groups as $group) {
+                            $ids[] = $group->getId();
+                        }
+                        if (!empty($ids)) {
+                            $qb->andWhere($qb->expr()->notIn('cg.id', $ids));
+                        }
+                        return $qb;
+                    },
+                    'choice_label' => 'name'
+                ))
+            ->add('Add user to group', 'submit')
+            ->getForm();
+    }
+
+
+
+    private function searchForm() {
+        return $this->createFormBuilder([])
+            ->setAction($this->generateUrl('contact_contact_searchcontact'))
+            ->add('searchPhrase', 'text')
+            ->add('Search', 'submit')
             ->getForm();
     }
 

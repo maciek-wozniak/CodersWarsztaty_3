@@ -59,7 +59,9 @@
     <p>Groups:
     <ul>
         {% for group in contact.groups %}
-            <li>{{ group.name }} </li>
+            <li>{{ group.name }}
+                <a href="{{ path('contact_group_removecontactfromgroup', {'contactId':contact.id, 'groupId':group.id, 'page':'contact'}) }}">Remove from group</a>
+            </li>
         {% else %}
             <li>Not defined</li>
         {% endfor %}
@@ -72,7 +74,8 @@
     <a href="{{ path('contact_contact_modify', {'id':contact.id}) }}">Add phone</a><br>
     <a href="{{ path('contact_contact_modify', {'id':contact.id}) }}">Add email</a><br>
     <a href="{{ path('contact_contact_modify', {'id':contact.id}) }}">Add address</a><br>
+    <a href="{{ path('contact_contact_modify', {'id':contact.id}) }}">Add to group</a><br>
 
-    <br><br>
-    <a href="{{ path('contact_contact_showall') }}">Show all</a>
+    <br>
+    <a href="{{ path('contact_contact_showall') }}">Show all contacts</a>
 {% endblock %}

@@ -1,0 +1,27 @@
+{% extends "ContactBundle::main.html.twig" %}
+
+{% block title %}Group details{% endblock %}
+
+{% block body %}
+
+    <h1>{{ group.name }} </h1>
+
+    <p>Contacts:
+    <ul>
+        {% for contact in group.contacts %}
+            <li>{{ contact.name }} {{ contact.surname }}
+
+
+            <a href="{{ path('contact_group_removecontactfromgroup', {'contactId':contact.id, 'groupId':group.id, 'page':'group'}) }}">Remove from group</a>
+            </li>
+        {% else %}
+            <li>No contacts</li>
+        {% endfor %}
+    </ul>
+    </p>
+
+
+    <br>
+    <a href="{{ path('contact_group_showall') }}">Show all groups</a><br>
+    <a href="{{ path('contact_contact_showall') }}">Show all contacts</a>
+{% endblock %}

@@ -8,8 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Contact
  *
- * @ORM\Table()
  * @ORM\Entity(repositoryClass="ContactBundle\Entity\ContactRepository")
+ * @ORM\Table()
  */
 class Contact {
     /**
@@ -62,7 +62,8 @@ class Contact {
 
     /**
      * Array of contact groups
-     * @ORM\ManyToMany(targetEntity="Group", mappedBy="contacts")
+     * @ORM\ManyToMany(targetEntity="ContactGroup", inversedBy="contacts")
+     * @ORM\JoinTable(name="contacts_groups")
      */
     private $groups;
 
@@ -83,8 +84,12 @@ class Contact {
         $this->groups = new ArrayCollection();
     }
 
-    public function addGroup(Group $group) {
+    public function addGroup(ContactGroup $group) {
         $this->groups[] = $group;
+    }
+
+    public function removeGroup(ContactGroup $group) {
+        $this->groups->removeElement($group);
     }
 
     public function getGroups() {

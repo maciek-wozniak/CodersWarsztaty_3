@@ -7,12 +7,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinTable;
 
 /**
- * Groups
+ * ContactGroup
  *
  * @ORM\Table()
  * @ORM\Entity()
  */
-class Group {
+class ContactGroup {
     /**
      * @var integer
      *
@@ -31,8 +31,8 @@ class Group {
 
     /**
      * @var string
-     * @ORM\ManyToMany(targetEntity="Contact", inversedBy="groups")
-     * @ORM\JoinTable(name="contacts_groups")
+     * @ORM\ManyToMany(targetEntity="Contact", mappedBy="groups")
+     *
      */
     private $contacts;
 
@@ -55,7 +55,7 @@ class Group {
      * Set name
      *
      * @param string $name
-     * @return Groups
+     * @return ContactGroup
      */
     public function setName($name) {
         $this->name = $name;
@@ -75,12 +75,10 @@ class Group {
     /**
      * Set contacts
      *
-     * @return Groups
+     * @return ContactGroup
      */
     public function addContact(Contact $contact) {
         $this->contacts[] = $contact;
-
-        return $this;
     }
 
     /**
@@ -91,4 +89,9 @@ class Group {
     public function getContacts() {
         return $this->contacts;
     }
+
+    public function removeContact(Contact $contact) {
+        $this->contacts->removeElement($contact);
+    }
+
 }
