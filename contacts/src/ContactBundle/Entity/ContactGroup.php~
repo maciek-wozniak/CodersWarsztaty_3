@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping\JoinTable;
  * ContactGroup
  *
  * @ORM\Table()
- * @ORM\Entity(repositoryClass="ContactBundle\Entity\ContactGroupRepository")
+ * @ORM\Entity()
  */
 class ContactGroup {
     /**

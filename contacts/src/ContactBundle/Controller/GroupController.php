@@ -15,8 +15,8 @@ class GroupController extends Controller {
      * @Template("ContactBundle:Group:new.html.twig")
      */
     public function newAction(Request $request) {
-
         $group = new ContactGroup();
+        $group->setUser($this->getUser());
         $form = $this->createFormBuilder($group)
             ->setAction($this->generateUrl('contact_group_new'))
             ->add('name')
@@ -39,12 +39,9 @@ class GroupController extends Controller {
      * @Route("/{id}/deleteGroup")
      */
     public function deleteAction($id) {
-        $repository = $this->getDoctrine()->getRepository('ContactBundle:ContactGroup');
-        $group = $repository->find($id);
-
-        if (!$group) {
-            throw $this->createNotFoundException('Group not found');
-        }
+        $group = $this->getGroup($id);
+        $this->checkIfGroupExists($group);
+        $this->checkPrivileges($group);
 
         $em = $this->getDoctrine()->getManager();
         $em->remove($group);
@@ -59,8 +56,9 @@ class GroupController extends Controller {
      * @Template()
      */
     public function showAction($id) {
-        $repository = $this->getDoctrine()->getRepository('ContactBundle:ContactGroup');
-        $group = $repository->find($id);
+        $group = $this->getGroup($id);
+        $this->checkIfGroupExists($group);
+        $this->checkPrivileges($group);
 
         return ['group' => $group];
     }
@@ -71,7 +69,7 @@ class GroupController extends Controller {
      */
     public function showAllAction() {
         $repository = $this->getDoctrine()->getRepository('ContactBundle:ContactGroup');
-        $groups = $repository->findAll();
+        $groups = $repository->findByUser($this->getUser());
 
         return ['groups' => $groups];
     }
@@ -83,8 +81,11 @@ class GroupController extends Controller {
         $repository = $this->getDoctrine()->getRepository('ContactBundle:Contact');
         $contact = $repository->find($contactId);
 
-        $repository = $this->getDoctrine()->getRepository('ContactBundle:ContactGroup');
-        $group = $repository->find($groupId);
+        $group = $this->getGroup($groupId);
+        $this->checkIfGroupExists($group);
+
+        $this->checkPrivileges($group);
+        $this->checkPrivileges($contact);
 
         $group->removeContact($contact);
         $contact->removeGroup($group);
@@ -108,5 +109,24 @@ class GroupController extends Controller {
 
 
         return $this->redirectToRoute($redirect, $slugs);
+    }
+
+    private function checkPrivileges($group) {
+        if ($this->getUser() != $group->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+    }
+
+    private function checkIfGroupExists($group) {
+        if (!$group) {
+            throw $this->createNotFoundException('Group not found');
+        }
+    }
+
+    private function getGroup($id) {
+        $repository = $this->getDoctrine()->getRepository('ContactBundle:ContactGroup');
+        $group = $repository->find($id);
+
+        return $group;
     }
 }

@@ -17,6 +17,7 @@ use Symfony\Component\BrowserKit\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
+
 class ContactController extends Controller {
 
     /**
@@ -31,6 +32,8 @@ class ContactController extends Controller {
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
+            $contact->setUser($this->getUser());
+            $this->getUser()->addContact($contact);
             $em = $this->getDoctrine()->getManager();
             $em->getRepository('ContactBundle:Contact');
             $em->persist($contact);
@@ -50,9 +53,8 @@ class ContactController extends Controller {
         $repository = $this->getDoctrine()->getRepository('ContactBundle:Contact');
         $contact = $repository->find($id);
 
-        if (!$contact) {
-            throw $this->createNotFoundException('Contact not found');
-        }
+        $this->checkIfContactExists($contact);
+        $this->isUserContact($contact);
 
         $url = $this->generateUrl('contact_contact_modify', ['id' => $id]);
         $form = $this->newContactForm($contact, 'Update', $url);
@@ -66,20 +68,12 @@ class ContactController extends Controller {
             return $this->redirectToRoute('contact_contact_show', ['id' => $contact->getId()]);
         }
 
-        $address = new Address();
-        $url = $this->generateUrl('contact_contact_newaddress', ['id' => $id]);
-        $addressForm = $this->newAddressForm($address, 'Add address', $url);
-
-        $email = new Email();
-        $url = $this->generateUrl('contact_contact_newemail', ['id' => $id]);
-        $emailForm = $this->newEmailForm($email, 'Add email', $url);
-
-        $phone = new Phone();
-        $url = $this->generateUrl('contact_contact_newphone', ['id' => $id]);
-        $phoneForm = $this->newPhoneForm($phone, 'Add phone', $url);
+        $addressForm = $this->generateAddressForm($id);
+        $emailForm = $this->generateEmailForm($id);
+        $phoneForm = $this->generatePhoneForm($id);
 
         $url = $this->generateUrl('contact_contact_newgroup', ['id' => $id]);
-        $groupForm = $this->newGroupForm($url, $contact->getGroups());
+        $groupForm = $this->newGroupForm($url, $contact->getGroups(), $this->getUser());
 
         return ['form' => $form->createView(),
                 'addressForm' => $addressForm->createView(),
@@ -98,23 +92,17 @@ class ContactController extends Controller {
         $repository = $this->getDoctrine()->getRepository('ContactBundle:Contact');
         $contact = $repository->find($id);
 
-        if (!$contact) {
-            throw $this->createNotFoundException('Contact not found');
-        }
+        $this->checkIfContactExists($contact);
+        $this->isUserContact($contact);
 
         $url = $this->generateUrl('contact_contact_modify', ['id' => $id]);
         $form = $this->newContactForm($contact, 'Update', $url);
 
-        $email = new Email();
-        $url = $this->generateUrl('contact_contact_newemail', ['id' => $id]);
-        $emailForm = $this->newEmailForm($email, 'Add email', $url);
-
-        $phone = new Phone();
-        $url = $this->generateUrl('contact_contact_newphone', ['id' => $id]);
-        $phoneForm = $this->newPhoneForm($phone, 'Add phone', $url);
+        $emailForm = $this->generateEmailForm($id);
+        $phoneForm = $this->generatePhoneForm($id);
 
         $url = $this->generateUrl('contact_contact_newgroup', ['id' => $id]);
-        $groupForm = $this->newGroupForm($url, $contact->getGroups());
+        $groupForm = $this->newGroupForm($url, $contact->getGroups(), $this->getUser());
 
         $address = new Address();
         $address->setContact($contact);
@@ -150,23 +138,17 @@ class ContactController extends Controller {
         $repository = $this->getDoctrine()->getRepository('ContactBundle:Contact');
         $contact = $repository->find($id);
 
-        if (!$contact) {
-            throw $this->createNotFoundException('Contact not found');
-        }
+        $this->checkIfContactExists($contact);
+        $this->isUserContact($contact);
 
         $url = $this->generateUrl('contact_contact_modify', ['id' => $id]);
         $form = $this->newContactForm($contact, 'Update', $url);
 
-        $address = new Address();
-        $url = $this->generateUrl('contact_contact_newaddress', ['id' => $id]);
-        $addressForm = $this->newAddressForm($address, 'Add address', $url);
-
-        $phone = new Phone();
-        $url = $this->generateUrl('contact_contact_newphone', ['id' => $id]);
-        $phoneForm = $this->newPhoneForm($phone, 'Add phone', $url);
+        $addressForm = $this->generateAddressForm($id);
+        $phoneForm = $this->generatePhoneForm($id);
 
         $url = $this->generateUrl('contact_contact_newgroup', ['id' => $id]);
-        $groupForm = $this->newGroupForm($url, $contact->getGroups());
+        $groupForm = $this->newGroupForm($url, $contact->getGroups(), $this->getUser());
 
         $email = new Email();
         $email->setContact($contact);
@@ -204,35 +186,29 @@ class ContactController extends Controller {
         $repository = $this->getDoctrine()->getRepository('ContactBundle:Contact');
         $contact = $repository->find($id);
 
-        if (!$contact) {
-            throw $this->createNotFoundException('Contact not found');
-        }
+        $this->checkIfContactExists($contact);
+        $this->isUserContact($contact);
 
         $url = $this->generateUrl('contact_contact_modify', ['id' => $id]);
         $form = $this->newContactForm($contact, 'Update', $url);
 
-        $address = new Address();
-        $url = $this->generateUrl('contact_contact_newaddress', ['id' => $id]);
-        $addressForm = $this->newAddressForm($address, 'Add address', $url);
-
-        $email = new Email();
-        $url = $this->generateUrl('contact_contact_newemail', ['id' => $id]);
-        $emailForm = $this->newEmailForm($email, 'Add email', $url);
+        $addressForm = $this->generateAddressForm($id);
+        $emailForm = $this->generateEmailForm($id);
 
         $url = $this->generateUrl('contact_contact_newgroup', ['id' => $id]);
-        $groupForm = $this->newGroupForm($url, $contact->getGroups());
+        $groupForm = $this->newGroupForm($url, $contact->getGroups(), $this->getUser());
 
         $phone = new Phone();
         $phone->setContact($contact);
         $url = $this->generateUrl('contact_contact_newphone', ['id' => $id]);
         $phoneForm = $this->newPhoneForm($phone, 'Add phone', $url);
+
         $phoneForm->handleRequest($request);
 
         if ($phoneForm->isSubmitted()) {
             $em = $this->getDoctrine()->getManager();
             $em->persist($phone);
             $em->flush();
-
 
             $contact->addPhone($phone);
             $this->addFlash('notice', 'Phone added');
@@ -258,27 +234,18 @@ class ContactController extends Controller {
         $repository = $this->getDoctrine()->getRepository('ContactBundle:Contact');
         $contact = $repository->find($id);
 
-        if (!$contact) {
-            throw $this->createNotFoundException('Contact not found');
-        }
+        $this->checkIfContactExists($contact);
+        $this->isUserContact($contact);
 
         $url = $this->generateUrl('contact_contact_modify', ['id' => $id]);
         $form = $this->newContactForm($contact, 'Update', $url);
 
-        $address = new Address();
-        $url = $this->generateUrl('contact_contact_newaddress', ['id' => $id]);
-        $addressForm = $this->newAddressForm($address, 'Add address', $url);
-
-        $email = new Email();
-        $url = $this->generateUrl('contact_contact_newemail', ['id' => $id]);
-        $emailForm = $this->newEmailForm($email, 'Add email', $url);
-
-        $phone = new Phone();
-        $url = $this->generateUrl('contact_contact_newphone', ['id' => $id]);
-        $phoneForm = $this->newPhoneForm($phone, 'Add phone', $url);
+        $addressForm = $this->generateAddressForm($id);
+        $emailForm = $this->generateEmailForm($id);
+        $phoneForm = $this->generatePhoneForm($id);
 
         $url = $this->generateUrl('contact_contact_newgroup', ['id' => $id]);
-        $groupForm = $this->newGroupForm($url, $contact->getGroups());
+        $groupForm = $this->newGroupForm($url, $contact->getGroups(), $this->getUser());
         $groupForm->handleRequest($request);
 
         if ($groupForm->isSubmitted()) {
@@ -315,27 +282,27 @@ class ContactController extends Controller {
         $repository = $this->getDoctrine()->getRepository('ContactBundle:Contact');
         $contact = $repository->find($id);
 
-        if (!$contact) {
-            throw $this->createNotFoundException('Contact not found');
-        }
+        $this->checkIfContactExists($contact);
+        $this->isUserContact($contact);
 
         $em = $this->getDoctrine()->getManager();
         $em->remove($contact);
         $em->flush();
         $this->addFlash('notice', 'User deleted');
 
+        // Zwraca response
         return $this->redirectToRoute('contact_contact_showall');
-
-        return new Response('');
     }
 
     /**
-     * @Route("/{id}")
+     * @Route("/{id}/show")
      * @Template()
      */
     public function showAction($id) {
         $repository = $this->getDoctrine()->getRepository('ContactBundle:Contact');
         $contact = $repository->find($id);
+
+        $this->isUserContact($contact);
 
         return ['contact' => $contact];
     }
@@ -347,7 +314,7 @@ class ContactController extends Controller {
      */
     public function showAllAction() {
         $repository = $this->getDoctrine()->getRepository('ContactBundle:Contact');
-        $contacts = $repository->findAll();
+        $contacts = $repository->findByUser($this->getUser());
         $search = $this->searchForm();
 
         return [
@@ -367,7 +334,7 @@ class ContactController extends Controller {
 
         $form = $searchForm->handleRequest($request);
         $search = $form->get('searchPhrase')->getData();
-        $contacts = $repository->findContacts($search);
+        $contacts = $repository->findContactsByName($search);
 
         return [
             'contacts' => $contacts,
@@ -415,14 +382,15 @@ class ContactController extends Controller {
             ->getForm();
     }
 
-    private function newGroupForm($url, $groups) {
+    private function newGroupForm($url, $groups, $user) {
 
         return $this->createFormBuilder([])
             ->setAction($url)
             ->add('group', 'entity', array(
                     'class' => 'ContactBundle:ContactGroup',
-                    'query_builder' => function (EntityRepository $er) use($groups) {
+                    'query_builder' => function (EntityRepository $er) use($groups, $user) {
                         $qb = $er->createQueryBuilder('cg');
+                        $qb->andWhere('cg.user = :user')->setParameter('user', $user);
                         $ids = [];
                         foreach ($groups as $group) {
                             $ids[] = $group->getId();
@@ -446,6 +414,43 @@ class ContactController extends Controller {
             ->add('searchPhrase', 'text')
             ->add('Search', 'submit')
             ->getForm();
+    }
+
+    private function isUserContact($contact) {
+        if ($contact->getUser() != $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+    }
+
+    private function checkIfContactExists($contact) {
+        if (!$contact) {
+            throw $this->createNotFoundException('Contact not found');
+        }
+    }
+
+    private function generateAddressForm($id) {
+        $address = new Address();
+        $url = $this->generateUrl('contact_contact_newaddress', ['id' => $id]);
+        $addressForm = $this->newAddressForm($address, 'Add address', $url);
+        return $addressForm;
+    }
+
+    private function generateEmailForm($id) {
+        $email = new Email();
+        $url = $this->generateUrl('contact_contact_newemail', ['id' => $id]);
+        $emailForm = $this->newEmailForm($email, 'Add email', $url);
+        return $emailForm;
+    }
+
+    /**
+     * @param $id
+     * @return array
+     */
+    private function generatePhoneForm($id) {
+        $phone = new Phone();
+        $url = $this->generateUrl('contact_contact_newphone', ['id' => $id]);
+        $phoneForm = $this->newPhoneForm($phone, 'Add phone', $url);
+        return $phoneForm;
     }
 
 }
