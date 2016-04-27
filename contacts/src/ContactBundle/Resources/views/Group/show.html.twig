@@ -4,24 +4,30 @@
 
 {% block body %}
 
-    <h1>{{ group.name }} </h1>
 
-    <p>Contacts:
-    <ul>
-        {% for contact in group.contacts %}
-            <li>{{ contact.name }} {{ contact.surname }}
-
-
-            <a href="{{ path('contact_group_removecontactfromgroup', {'contactId':contact.id, 'groupId':group.id, 'page':'group'}) }}">Remove from group</a>
-            </li>
-        {% else %}
-            <li>No contacts</li>
-        {% endfor %}
-    </ul>
-    </p>
+    <div class="panel panel-primary" style="width: 50%; margin: auto;">
+        <div class="panel-heading"><strong>Group: {{ group.name }}</strong></div>
+        <div class="panel-body">
+            <p>Contacts:
+            <ul>
+                {% for contact in group.contacts %}
+                    <li>{{ contact.name }} {{ contact.surname }}
 
 
-    <br>
-    <a href="{{ path('contact_group_showall') }}">Show all groups</a><br>
-    <a href="{{ path('contact_contact_showall') }}">Show all contacts</a>
+                        <a class="btn btn-danger btn-xs" href="{{ path('contact_group_removecontactfromgroup', {'contactId':contact.id, 'groupId':group.id, 'page':'group'}) }}">Remove
+                            from group</a>
+                    </li>
+                {% else %}
+                    <li>No contacts</li>
+                {% endfor %}
+            </ul>
+            </p>
+        </div>
+    </div>
+
+    <div style="width: 250px; margin: auto; margin-top: 10px;">
+        <a class="btn btn-primary btn-xs" href="{{ path('contact_group_showall') }}">Show all groups</a>
+        <a class="btn btn-primary btn-xs" href="{{ path('contact_contact_showall') }}">Show all contacts</a>
+    </div>
+
 {% endblock %}

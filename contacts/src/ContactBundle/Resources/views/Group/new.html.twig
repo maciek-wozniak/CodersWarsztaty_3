@@ -4,9 +4,10 @@
 
 {% block body %}
 
-    {{ form_start(groupForm) }}
-    {{ form_widget(groupForm) }}
-    {{ form_end(groupForm) }}
+    {% form_theme groupForm 'bootstrap_3_layout.html.twig' %}
+    <div class="well" style="width: 400px; margin: auto;">
 
+    {{ form(groupForm) }}
+</div>
 
 {% endblock %}

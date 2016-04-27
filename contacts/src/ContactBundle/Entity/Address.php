@@ -3,6 +3,7 @@
 namespace ContactBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Address
@@ -25,6 +26,9 @@ class Address
      * @var string
      *
      * @ORM\Column(name="city", type="string", length=255)
+     * @Assert\NotBlank()
+     * @Assert\NotNull()
+     * @Assert\Length(min=3, max=255)
      */
     private $city;
 
@@ -32,6 +36,9 @@ class Address
      * @var string
      *
      * @ORM\Column(name="street", type="string", length=255)
+     * @Assert\NotBlank()
+     * @Assert\NotNull()
+     * @Assert\Length(min=3, max=255)
      */
     private $street;
 
@@ -39,6 +46,9 @@ class Address
      * @var integer
      *
      * @ORM\Column(name="house_number", type="integer")
+     * @Assert\NotBlank()
+     * @Assert\NotNull()
+     * @Assert\GreaterThan(0)
      */
     private $houseNumber;
 
@@ -51,6 +61,9 @@ class Address
 
     /**
      * @ORM\ManyToOne(targetEntity="Contact", inversedBy="addresses")
+     * @Assert\NotBlank()
+     * @Assert\NotNull()
+     *
      */
     private $contact;
 

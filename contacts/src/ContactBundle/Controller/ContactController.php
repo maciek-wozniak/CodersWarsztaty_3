@@ -31,7 +31,7 @@ class ContactController extends Controller {
         $form = $this->newContactForm($contact, 'Add', $url);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $contact->setUser($this->getUser());
             $this->getUser()->addContact($contact);
             $em = $this->getDoctrine()->getManager();
@@ -60,7 +60,7 @@ class ContactController extends Controller {
         $form = $this->newContactForm($contact, 'Update', $url);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $em->flush();
 
@@ -85,7 +85,7 @@ class ContactController extends Controller {
 
     /**
      * @Route("/{id}/addAddress")
-     * @Template("ContactBundle:Contact:new.html.twig")
+     * @Template("ContactBundle:Contact:modify.html.twig")
      * @Method("POST")
      */
     public function newAddressAction(Request $request, $id) {
@@ -110,7 +110,7 @@ class ContactController extends Controller {
         $addressForm = $this->newAddressForm($address, 'Add address', $url);
         $addressForm->handleRequest($request);
 
-        if ($addressForm->isSubmitted()) {
+        if ($addressForm->isSubmitted() && $addressForm->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $em->persist($address);
             $em->flush();
@@ -121,7 +121,7 @@ class ContactController extends Controller {
         }
 
         return ['form' => $form->createView(),
-                'addressFrom' => $addressForm->createView(),
+                'addressForm' => $addressForm->createView(),
                 'emailForm' => $emailForm->createView(),
                 'phoneForm' => $phoneForm->createView(),
                 'groupForm' => $groupForm->createView()
@@ -130,7 +130,7 @@ class ContactController extends Controller {
 
     /**
      * @Route("/{id}/addEmail")
-     * @Template("ContactBundle:Contact:new.html.twig")
+     * @Template("ContactBundle:Contact:modify.html.twig")
      * @Method("POST")
      */
 
@@ -156,7 +156,7 @@ class ContactController extends Controller {
         $emailForm = $this->newEmailForm($email, 'Add email', $url);
         $emailForm->handleRequest($request);
 
-        if ($emailForm->isSubmitted()) {
+        if ($emailForm->isSubmitted() && $emailForm->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $em->persist($email);
             $em->flush();
@@ -168,7 +168,7 @@ class ContactController extends Controller {
         }
 
         return ['form' => $form->createView(),
-            'addressFrom' => $addressForm->createView(),
+            'addressForm' => $addressForm->createView(),
             'emailForm' => $emailForm->createView(),
             'phoneForm' => $phoneForm->createView(),
             'groupForm' => $groupForm->createView()
@@ -178,7 +178,7 @@ class ContactController extends Controller {
 
     /**
      * @Route("/{id}/addPhone")
-     * @Template("ContactBundle:Contact:new.html.twig")
+     * @Template("ContactBundle:Contact:modify.html.twig")
      * @Method("POST")
      */
 
@@ -205,7 +205,7 @@ class ContactController extends Controller {
 
         $phoneForm->handleRequest($request);
 
-        if ($phoneForm->isSubmitted()) {
+        if ($phoneForm->isSubmitted() && $phoneForm->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $em->persist($phone);
             $em->flush();
@@ -216,7 +216,7 @@ class ContactController extends Controller {
         }
 
         return ['form' => $form->createView(),
-            'addressFrom' => $addressForm->createView(),
+            'addressForm' => $addressForm->createView(),
             'emailForm' => $emailForm->createView(),
             'phoneForm' => $phoneForm->createView(),
             'groupForm' => $groupForm->createView()
@@ -226,7 +226,7 @@ class ContactController extends Controller {
 
     /**
      * @Route("/{id}/addGroup")
-     * @Template("ContactBundle:Contact:new.html.twig")
+     * @Template("ContactBundle:Contact:modify.html.twig")
      * @Method("POST")
      */
 
@@ -248,7 +248,7 @@ class ContactController extends Controller {
         $groupForm = $this->newGroupForm($url, $contact->getGroups(), $this->getUser());
         $groupForm->handleRequest($request);
 
-        if ($groupForm->isSubmitted()) {
+        if ($groupForm->isSubmitted() && $groupForm->isValid()) {
             $em = $this->getDoctrine()->getManager();
 
             $group = $groupForm->getData()['group'];
@@ -266,7 +266,7 @@ class ContactController extends Controller {
         }
 
         return ['form' => $form->createView(),
-            'addressFrom' => $addressForm->createView(),
+            'addressForm' => $addressForm->createView(),
             'emailForm' => $emailForm->createView(),
             'phoneForm' => $phoneForm->createView(),
             'groupForm' => $groupForm->createView()
@@ -348,7 +348,11 @@ class ContactController extends Controller {
             ->add('name')
             ->add('surname')
             ->add('description')
-            ->add($submit, 'submit')
+            ->add($submit, 'submit',  array(
+                'label' => $submit,
+                'attr' => array(
+                    'class' => 'btn btn-success btn-xs',
+                )))
             ->getForm();
     }
 
@@ -360,7 +364,11 @@ class ContactController extends Controller {
             ->add('street')
             ->add('houseNumber')
             ->add('flatNumber')
-            ->add($submit, 'submit')
+            ->add($submit, 'submit',  array(
+                'label' => $submit,
+                'attr' => array(
+                    'class' => 'btn btn-success btn-xs',
+                )))
             ->getForm();
     }
 
@@ -369,7 +377,11 @@ class ContactController extends Controller {
             ->setAction($url)
             ->add('address')
             ->add('type')
-            ->add($submit, 'submit')
+            ->add($submit, 'submit',  array(
+                'label' => $submit,
+                'attr' => array(
+                    'class' => 'btn btn-success btn-xs',
+                )))
             ->getForm();
     }
 
@@ -378,7 +390,11 @@ class ContactController extends Controller {
             ->setAction($url)
             ->add('number')
             ->add('type')
-            ->add($submit, 'submit')
+            ->add($submit, 'submit',  array(
+                'label' => $submit,
+                'attr' => array(
+                    'class' => 'btn btn-success btn-xs',
+                )))
             ->getForm();
     }
 
@@ -402,7 +418,11 @@ class ContactController extends Controller {
                     },
                     'choice_label' => 'name'
                 ))
-            ->add('Add user to group', 'submit')
+            ->add('Add user to group', 'submit',  array(
+                'label' => 'Add user to group',
+                'attr' => array(
+                    'class' => 'btn btn-success btn-xs',
+                )))
             ->getForm();
     }
 
@@ -412,7 +432,11 @@ class ContactController extends Controller {
         return $this->createFormBuilder([])
             ->setAction($this->generateUrl('contact_contact_searchcontact'))
             ->add('searchPhrase', 'text')
-            ->add('Search', 'submit')
+            ->add('Search', 'submit',  array(
+                'label' => 'Search',
+                'attr' => array(
+                    'class' => 'btn btn-info btn-xs',
+                )))
             ->getForm();
     }
 

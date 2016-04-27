@@ -6,6 +6,7 @@ use ContactBundle\Entity\User;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinTable;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * ContactGroup
@@ -27,6 +28,9 @@ class ContactGroup {
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
+     * @Assert\NotBlank()
+     * @Assert\NotNull()
+     * @Assert\Length(min=3, max=255)
      */
     private $name;
 
@@ -40,6 +44,8 @@ class ContactGroup {
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="contactGroups")
      * @ORM\JoinColumn(nullable=false)
+     * @Assert\NotBlank()
+     * @Assert\NotNull()
      */
     private $user;
 

@@ -8,19 +8,28 @@
         <div> {{ flash_message }} </div><br>
     {% endfor %}
     <p>All groups:</p>
-    <ul>
-    {% for group in groups %}
-        <li>
-            <a href="{{ path('contact_group_show', {'id':group.id}) }}">
-                {{ group.name }}
-            </a> -
 
-            <a href="{{ path('contact_group_delete', {'id':group.id}) }}">Delete</a>
-        </li>
-    {% else %}
-        Brak grup
-    {% endfor %}
-    </ul>
-    <a href="{{ path('contact_group_new') }}">Add group</a><br>
-    <a href="{{ path('contact_contact_showall') }}">All contacts</a><br>
+    <table class="table table-hover" >
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for group in groups %}
+            <tr>
+                <td><a href="{{ path('contact_group_show', {'id':group.id}) }}">{{ group.name }}</a></td>
+                <td><a class="btn btn-danger btn-xs"
+                       href="{{ path('contact_group_delete', {'id':group.id}) }}">Delete</a></td>
+            </tr>
+        {% else %}
+            No groups
+        {% endfor %}
+        </tbody>
+    </table>
+    <a class="btn btn-success btn-xs" href="{{ path('contact_group_new') }}">Add group</a>
+    <a class="btn btn-primary btn-xs" href="{{ path('contact_contact_showall') }}">All contacts</a>
+
 {% endblock %}

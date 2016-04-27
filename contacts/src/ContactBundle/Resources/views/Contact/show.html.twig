@@ -5,71 +5,108 @@
 {% block body %}
 
     {% for flash_message in app.session.flashBag.get('notice') %}
-        <div> {{ flash_message }} </div><br>
+        <div class="alert alert-info">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            {{ flash_message }} </div><br>
     {% endfor %}
 
-    <h1>{{ contact.name }} {{ contact.surname }}</h1>
-    <p>{{ contact.description  }}</p>
+    <div class="panel panel-primary" style="width: 50%; margin: auto;">
+        <div class="panel-heading"><strong>{{ contact.name }} {{ contact.surname }}</strong></div>
+        <div class="panel-body">{{ contact.description }}</div>
+    </div>
 
-    <p>Phone:
-    <ul>
-        {% for phone in contact.phones %}
-            <li>{{ phone.number }}
-                {% if phone.type is not null %}
-                    - {{ phone.type }}
-                {% endif %}
-                <a href="{{ path('contact_phone_delete', {'contact':contact.id, 'id':phone.id}) }}">Delete</a>
-            </li>
-        {% else %}
-            <li>Not defined</li>
-        {% endfor %}
-    </ul>
-    </p>
+    <div class="row" style="margin-top: 10px;">
+        <div class="col-sm-6">
 
-    <p>Email:
-        <ul>
-            {% for email in contact.emails %}
-                <li>{{ email.address }}
-                    {% if email.type is not null %}
-                        - {{ email.type }}
-                    {% endif %}
-                    <a href="{{ path('contact_email_delete', {'contact':contact.id, 'id':email.id}) }}">Delete</a>
-                </li>
-            {% else %}
-                <li>Not defined</li>
-            {% endfor %}
-        </ul>
-    </p>
+            <div class="panel panel-info">
+                <div class="panel-heading"><strong>Phone:</strong></div>
+                <div class="panel-body">
+                    <ul>
+                        {% for phone in contact.phones %}
+                            <li>{{ phone.number }}
+                                {% if phone.type is not null %}
+                                    - {{ phone.type }}
+                                {% endif %}
+                                <a class="btn btn-danger btn-xs"
+                                   href="{{ path('contact_phone_delete', {'contact':contact.id, 'id':phone.id}) }}">Delete</a>
+                            </li>
+                        {% else %}
+                            <li>Not defined</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
 
-    <p>Address:
-        <ul>
-        {% for address in contact.addresses %}
-            <li>{{ address.city }} {{ address.street }} {{ address.houseNumber }}
-                {% if address.flatNumber is not null %}
-                    / {{ address.flatNumber }}
-                {% endif %}
-                <a href="{{ path('contact_address_delete', {'contact':contact.id, 'id':address.id}) }}">Delete</a>
-            </li>
-        {% else %}
-            <li>Not defined</li>
-        {% endfor %}
-        </ul>
-    </p>
-
-    <p>Groups:
-    <ul>
-        {% for group in contact.groups %}
-            <li>{{ group.name }}
-                <a href="{{ path('contact_group_removecontactfromgroup', {'contactId':contact.id, 'groupId':group.id, 'page':'contact'}) }}">Remove from group</a>
-            </li>
-        {% else %}
-            <li>Not defined</li>
-        {% endfor %}
-    </ul>
-    </p>
+        <div class="col-sm-6 ">
+            <div class="panel panel-info">
+                <div class="panel-heading"><strong>E-mail::</strong></div>
+                <div class="panel-body">
+                    <ul>
+                        {% for email in contact.emails %}
+                            <li>{{ email.address }}
+                                {% if email.type is not null %}
+                                    - {{ email.type }}
+                                {% endif %}
+                                <a class="btn btn-danger btn-xs"
+                                   href="{{ path('contact_email_delete', {'contact':contact.id, 'id':email.id}) }}">Delete</a>
+                            </li>
+                        {% else %}
+                            <li>Not defined</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
-    <br>
-    <a href="{{ path('contact_contact_modify', {'id':contact.id}) }}">Edit</a><br>
-    <a href="{{ path('contact_contact_showall') }}">Show all contacts</a>
+
+    <div class="row">
+        <div class="col-sm-6">
+
+            <div class="panel panel-info">
+                <div class="panel-heading"><strong>Address:</strong></div>
+                <div class="panel-body">
+                    <ul>
+                        {% for address in contact.addresses %}
+                            <li>{{ address.city }} {{ address.street }} {{ address.houseNumber }}
+                                {% if address.flatNumber is not null %}
+                                    / {{ address.flatNumber }}
+                                {% endif %}
+                                <a class="btn btn-danger btn-xs"
+                                   href="{{ path('contact_address_delete', {'contact':contact.id, 'id':address.id}) }}">Delete</a>
+                            </li>
+                        {% else %}
+                            <li>Not defined</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6">
+            <div class="panel panel-info">
+                <div class="panel-heading"><strong>Groups:</strong></div>
+                <div class="panel-body">
+                    <ul>
+                        {% for group in contact.groups %}
+                            <li>{{ group.name }}
+                                <a class="btn btn-danger btn-xs"
+                                   href="{{ path('contact_group_removecontactfromgroup', {'contactId':contact.id, 'groupId':group.id, 'page':'contact'}) }}">Remove
+                                    from group</a>
+                            </li>
+                        {% else %}
+                            <li>Not defined</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="width: 150px; margin: auto;">
+        <a class="btn btn-primary btn-xs" href="{{ path('contact_contact_modify', {'id':contact.id}) }}">Edit</a>
+        <a class="btn btn-primary btn-xs" href="{{ path('contact_contact_showall') }}">Show all contacts</a>
+    </div>
 {% endblock %}

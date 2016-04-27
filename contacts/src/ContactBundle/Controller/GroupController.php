@@ -20,7 +20,11 @@ class GroupController extends Controller {
         $form = $this->createFormBuilder($group)
             ->setAction($this->generateUrl('contact_group_new'))
             ->add('name')
-            ->add('Add group', 'submit')
+            ->add('Add group', 'submit',  array(
+                'label' => 'Add group',
+                'attr' => array(
+                    'class' => 'btn btn-success btn-xs',
+                )))
             ->getForm();
         $form->handleRequest($request);
 
